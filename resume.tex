@@ -1,0 +1,631 @@
+\documentclass[%
+               singlesided,
+               paper=a4,
+               fontsize=9pt
+              ]{my-resume}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Geometría vertical (A4 retrato ≈ 21 × 29,7 cm)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\setlength\highlightwidth{7.25cm}
+\setlength\headerheight{6cm}
+\setlength\marginleft{0.48cm}
+\setlength\marginright{0.92cm}
+\setlength\margintop{0.32cm}
+\setlength\marginbottom{0.32cm}
+
+% Gutter entre barra gris (ancho \highlightwidth) y columna principal; dentro de la barra, relleno derecho antes del gutter.
+\newlength{\cvinnerpad}
+\newlength{\cvbodygutter}
+\newlength{\cvsideleftpad}
+\newlength{\cvsectionrulewidth}
+\newlength{\cvhicolwd}
+\newlength{\cvmaincolwd}
+\setlength{\cvinnerpad}{0.42cm}
+\setlength{\cvbodygutter}{0.48cm}
+\setlength{\cvsideleftpad}{0.4cm}
+% Desplazamiento de la foto dentro de su casilla; \cvheadtextnarrow corre la foto hacia el texto.
+\newlength{\cvheadphotonudge}
+\setlength{\cvheadphotonudge}{2.5mm}
+\newlength{\cvheadtextnarrow}
+\setlength{\cvheadtextnarrow}{6.4mm}
+
+\geometry{left=\marginleft,right=\marginright,top=\margintop,bottom=\marginbottom}
+
+% Fondo en todas las páginas: eso-pic + \AtPageLowerLeft (sin rotación; tras \clearpage se re-registra).
+\usepackage{eso-pic}
+\newcommand{\cvPageBg}{%
+    \AtPageLowerLeft{%
+        \includegraphics[width=\paperwidth,height=\paperheight,keepaspectratio=false]{bg-pink-resume.png}%
+    }%
+}%
+\AddToShipoutPictureBG*{\cvPageBg}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Ajustes compactos para vertical
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\colorlet{highlightbarcolor}{white}
+\colorlet{headerbarcolor}{awesome-red}
+\colorlet{headerfontcolor}{black}
+\colorlet{accent}{awesome-red}
+\colorlet{heading}{black}
+\colorlet{emphasis}{black}
+\colorlet{body}{black}
+
+\makeatletter
+% Página sin franja lateral opaca.
+\DeclareNewPageStyleByLayers{cvpage}{}
+% Secciones: regla acotada al ancho de columna (\cvsectionrulewidth se fija al abrir cada minipage del cuerpo).
+\renewcommand{\section}[2][]{%
+    \par\addvspace{0.55em}%
+    \ifstrequal{#1}{}{}{\normalsize \makebox[5mm][c]{#1}\hspace{0.5em}}
+    {\color{heading}\large\bfseries\MakeUppercase{#2}}\\[-1ex]%
+    \noindent{\color{heading}\rule{\cvsectionrulewidth}{0.8pt}\par}\vspace{0.2em}
+}
+
+% Secciones en la columna gris (Contacto, Aptitudes, …): más aire entre bloques.
+\newcommand{\sidebarsection}[2][]{%
+    \par\addvspace{1.12em}%
+    \ifstrequal{#1}{}{}{\normalsize \makebox[5mm][c]{#1}\hspace{0.5em}}
+    {\color{heading}\large\bfseries\MakeUppercase{#2}}\\[-1ex]%
+    \noindent{\color{heading}\rule{\cvsectionrulewidth}{0.8pt}\par}\vspace{0.28em}
+}
+
+% Dos aptitudes por fila, solo nombre (sin nivel)
+\newcommand{\skillpairname}[2]{%
+    \noindent
+    \begin{minipage}[t]{\dimexpr 0.5\linewidth - 0.28em}%
+        \simpleskill{#1}%
+    \end{minipage}\hfill
+    \begin{minipage}[t]{\dimexpr 0.5\linewidth - 0.28em}%
+        \simpleskill{#2}%
+    \end{minipage}\par\vspace{0.04em}%
+}
+
+% Entradas fecha+lugar | puesto: algo más de ancho a la izquierda y \raggedright para no recortar texto.
+\renewcommand{\job}[4]{%
+    \setlength{\jobdateplacelength}{0.29\linewidth}%
+    \setlength{\jobpositionlength}{0.71\linewidth}%
+    \begin{minipage}[t]{\jobdateplacelength}%
+        \raggedright
+        \footnotesize
+        \begin{minipage}[t]{3mm}%
+            \makebox[3mm][c]{\faCalendar}
+        \end{minipage}%
+        \hspace{0.4em}%
+        \begin{minipage}[t]{\dimexpr \jobdateplacelength-3mm-0.4em}%
+            #1
+        \end{minipage}%
+        \par\vspace{0.05em}
+        \begin{minipage}[t]{3mm}%
+            \makebox[3mm][c]{\faMapMarker}
+        \end{minipage}%
+        \hspace{0.4em}%
+        \begin{minipage}[t]{\dimexpr \jobdateplacelength-3mm-0.4em}%
+            #2
+        \end{minipage}%
+    \end{minipage}%
+    \begin{minipage}[t]{\jobpositionlength}%
+        \raggedright
+        {\normalsize \color{emphasis} #3}
+    \end{minipage}%
+    \ifstrequal{#4}{}{}{\par\vspace{0.04em}\begingroup\footnotesize\raggedright #4\endgroup}
+    \par\normalsize\vspace{0.12em}
+}
+
+% Columnas del cuerpo: anchos explícitos compartidos (mismo valor para minipage, \linewidth y regla).
+\renewcommand{\highlightbar}[1]{%
+    \def\@highlightbar{%
+        \setlength{\cvhicolwd}{\dimexpr\highlightwidth-\cvinnerpad-\cvsideleftpad\relax}%
+        \noindent\hspace*{\cvsideleftpad}%
+        \begin{minipage}[t]{\cvhicolwd}%
+            \setlength{\linewidth}{\cvhicolwd}%
+            \setlength{\columnwidth}{\cvhicolwd}%
+            \setlength{\cvsectionrulewidth}{\cvhicolwd}%
+            \raggedright
+            #1%
+        \end{minipage}%
+        \hspace{\cvinnerpad}%
+    }%
+}
+\renewcommand{\mainbar}[1]{%
+    \def\@mainbar{%
+        \setlength{\cvmaincolwd}{\dimexpr\textwidth-\highlightwidth-\cvbodygutter\relax}%
+        \begin{minipage}[t]{\cvmaincolwd}%
+            \setlength{\linewidth}{\cvmaincolwd}%
+            \setlength{\columnwidth}{\cvmaincolwd}%
+            \setlength{\cvsectionrulewidth}{\cvmaincolwd}%
+            \raggedright
+            #1%
+        \end{minipage}%
+    }%
+}
+% Sin saltos de línea/espacios entre cajas: evita que la 2.ª columna baje y "colapse" el ancho.
+\renewcommand{\makebody}{%
+    \ifthenelse{\boolean{@singleordouble}}{%
+        \noindent\@highlightbar\hspace{\cvbodygutter}\@mainbar
+    }{%
+        \ifthispageodd{%
+            \noindent\@highlightbar\hspace{\cvbodygutter}\@mainbar
+        }{%
+            \noindent\@mainbar\hspace{\cvbodygutter}\@highlightbar
+        }%
+    }%
+}
+
+% Campos de contacto más compactos
+\renewcommand{\infofield}[2]{\mbox{\makebox[4mm]{\textcolor{accent}{\small #1}}\hspace{0.35em}#2}\vspace{0.12em}\newline}
+
+% Encabezado: titular + resumen en la franja + foto más grande + pie (p. ej. ubicación)
+\newcommand{\cvheadline}[1]{\def\@cvheadline{#1}}
+\newcommand{\cvsummary}[1]{\def\@cvsummary{#1}}
+\newcommand{\cvheaderfooter}[1]{\def\@cvheaderfooter{#1}}
+\def\@cvheadline{}
+\def\@cvsummary{}
+\def\@cvheaderfooter{}
+% Encabezado sin caja de color. Entre nombre, titular y resumen: solo espacio vertical (equivalente ~ a la antigua barra de 4pt + márgenes).
+\setlength{\fboxrule}{0pt}%
+\setlength{\fboxsep}{0pt}%
+\newcommand{\@cvheadhrule}{%
+    \par\nointerlineskip
+    \vspace{\dimexpr 0.12em + 4pt + 0.2em\relax}%
+}%
+\renewcommand{\makeheader}{%
+    \noindent
+    \begin{minipage}[t]{\textwidth}%
+        \vspace{0pt}%
+        \ifdef{\@photodiameter}{%
+            \noindent
+            \begin{minipage}[t]{\dimexpr \linewidth-\@photodiameter-0.35em-\cvheadtextnarrow\relax}%
+                \raggedright
+                \color{headerfontcolor}%
+                \@cvheadhrule
+                {\huge\bfseries\MakeUppercase{\@name}\par}%
+                \@cvheadhrule
+                {\large\bfseries\@cvheadline\par}%
+                \ifdefempty{\@cvsummary}{%
+                    \ifdefempty{\@cvheaderfooter}{}{%
+                        \@cvheadhrule
+                        \noindent{\small\mdseries\faMapMarker\hspace{0.3em}\@cvheaderfooter\par}%
+                    }%
+                }{%
+                    \@cvheadhrule
+                    {\small\mdseries\@cvsummary\par}%
+                    \ifdefempty{\@cvheaderfooter}{}{%
+                        \@cvheadhrule
+                        \noindent{\small\mdseries\faMapMarker\hspace{0.3em}\@cvheaderfooter\par}%
+                    }%
+                }%
+            \end{minipage}\hspace{0.35em}%
+            \begin{minipage}[t]{\@photodiameter}%
+                \vspace{0pt}%
+                \noindent\hspace*{\cvheadphotonudge}%
+                \begin{minipage}[t]{\dimexpr\@photodiameter-\cvheadphotonudge\relax}%
+                    \vspace{0pt}%
+                    \ifthenelse{\equal{\@photoformat}{square}}{%
+                        \includegraphics[width=\linewidth]{\@photo}%
+                    }{%
+                        \tikz\path[fill overzoom image={\@photo}]circle[radius=0.5\linewidth];
+                    }%
+                \end{minipage}%
+            \end{minipage}%
+        }{%
+            \raggedright
+            \color{headerfontcolor}%
+            \@cvheadhrule
+            {\huge\bfseries\MakeUppercase{\@name}\par}%
+            \@cvheadhrule
+            {\large\bfseries\@cvheadline\par}%
+            \ifdefempty{\@cvsummary}{%
+                \ifdefempty{\@cvheaderfooter}{}{%
+                    \@cvheadhrule
+                    \noindent{\small\mdseries\faMapMarker\hspace{0.3em}\@cvheaderfooter\par}%
+                }%
+            }{%
+                \@cvheadhrule
+                {\small\mdseries\@cvsummary\par}%
+                \ifdefempty{\@cvheaderfooter}{}{%
+                    \@cvheadhrule
+                    \noindent{\small\mdseries\faMapMarker\hspace{0.3em}\@cvheaderfooter\par}%
+                }%
+            }%
+        }%
+    \end{minipage}\par
+}
+\makeatother
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{document}
+\pagestyle{cvpage}%
+\raggedbottom
+
+\name{Ana Gabriela Ordoñez Güemes}
+\cvheadline{AI Engineer · Python Developer · Machine Learning\par\vspace{0.12em}On-premises LLMs · AI Agents}
+\cvheaderfooter{Mexico City, Mexico}
+\cvsummary{Python development, automation, and API integration; n8n, AI agents, and applied ML. Experience with APIs, microservices, Kafka, CI/CD, and automated testing. M.Sc.\ Mathematical Engineering \& Computing (UNIR) and B.Eng.\ Telematics Engineering (UPIITA-IPN).}
+\photo[round]{profile.jpg}{4.25cm}
+
+\makeheader
+\vspace{0.45em}
+% ===== Body: sidebar + main column (English) =====
+
+
+\highlightbar{
+
+    \sidebarsection{Contact}
+    \email{gabyordgue@gmail.com}
+    \phone{+52 55 2873 9945}
+    \location{Mexico City, Mexico}
+    \homepage{gabyordonez.com}{https://gabyordonez.com/}
+    \homepage{GitHub}{https://github.com/sigmadg}
+    \linkedin{agabrielaordonezg}{https://www.linkedin.com/in/agabrielaordonezg}
+
+    \sidebarsection{Skills}
+
+    \skillsection{Automation \& AI}
+    \skillpairname{Python}{n8n}
+    \skillpairname{AI Agents}{LangChain}
+    \skillpairname{Deep Learning}{PyTorch}
+    \skillpairname{GitHub Actions}{Playwright}
+    \skillpairname{Jupyter}{Local LLMs}
+    \skillpairname{MATLAB}{Simulink}
+    \simpleskill{\LaTeX}
+
+    \vspace{0.15em}
+    \skillsection{Cloud \& backend}
+    \skillpairname{APIs}{Microservices}
+    \skillpairname{AWS Lambda}{AWS S3}
+    \skillpairname{Kafka}{Vue.js}
+    \skillpairname{Spring Boot}{Quarkus}
+    \skillpairname{C\#}{.NET}
+    \skillpairname{Flutter}{PL/SQL}
+    \skillpairname{MongoDB}{MySQL}
+
+    \vspace{0.15em}
+    \skillsection{Quality \& DevOps}
+    \skillpairname{Selenium}{Cypress}
+    \skillpairname{Jenkins}{Docker / Bash}
+    \skillpairname{Terraform}{Kubernetes}
+    \simpleskill{Git}
+
+    \vspace{0.15em}
+    \skillsection{Soft skills}
+    \simpleskill{Clear communication}
+    \simpleskill{Self-management}
+    \simpleskill{Collaboration}
+    \simpleskill{Documentation}
+    \simpleskill{Proactivity}
+    \simpleskill{Time management}
+
+    \sidebarsection{Languages}
+    \simpleskill{Spanish (C2)}
+    \simpleskill{English (B1)}
+
+    \sidebarsection{Certifications}
+    \simpleskill{Master Big Data \& BI (EEBE)}
+    \simpleskill{Master Enterprise AI (EEBE)}
+    \simpleskill{Circuits \& Electronics (MITx)}
+    \simpleskill{Computer Systems Technician}
+    \simpleskill{Digital Graphic Design Technician}
+
+    \sidebarsection{Links}
+    \homepage{Courses}{https://drive.google.com/drive/folders/16cvOwrCB_geqIQOabGLMpdz50U-KTZm2?usp=drive_link}
+    \homepage{Certificates}{https://drive.google.com/drive/folders/1TkdAf2R2titBM4nMeZdWtvO6gMa8j_QN?usp=drive_link}
+}
+
+\mainbar{
+
+    \section[\faGears]{Work experience}
+
+    \job{06/2022 --- 02/2026}
+        {Grupo Salinas}
+        {New Technologies Developer}
+        {\begin{itemize}
+            \item APIs, microservices, AI/LLM, n8n, Kafka, and Kafka adapter in .NET.
+            \item Automated OpenAPI/AsyncAPI; facial recognition; Selenium, Jenkins, and DevOps.
+        \end{itemize}}
+
+    \job{08/2021 --- 07/2022}
+        {GoNet}
+        {Middleware Front-End Developer}
+        {\begin{itemize}
+            \item Enterprise front end (Vue.js) for Palace Resorts.
+        \end{itemize}}
+
+    \job{02/2019 --- 01/2021}
+        {IBM}
+        {Oracle Application Developer: EBS}
+        {\begin{itemize}
+            \item Apprentice program: PL/SQL and incidents for banking and insurance clients.
+            \item Production incidents, BPM (JavaScript), and unit tests in financial services.
+        \end{itemize}}
+
+    \section[\faMortarBoard]{Education}
+
+    \job{02/2024 --- 02/2026}
+        {UNIR}
+        {M.Sc.\ Mathematical Engineering \& Computing}
+        {ML, numerical methods, and modelling.}
+
+    \job{08/2012 --- 12/2018}
+        {UPIITA-IPN}
+        {B.Eng.\ Telematics Engineering}
+        {Telecommunications, networks, and programming.}
+
+    \job{06/2009 --- 06/2012}
+        {CECyT 1 IPN}
+        {Digital systems technician}
+        {Electronics and programming.}
+
+    \section{Volunteering}
+
+    \job{08/2021 --- 11/2021}
+        {Polibots Academy}
+        {Community Manager}
+        {Community outreach and academic communication.}
+
+    \job{08/2019 --- 11/2019}
+        {Chess UPIITA}
+        {Coordinator}
+        {Classes, workshop coordination, and administrative tasks.}
+
+    \job{09/2010 --- 07/2012}
+        {UDI CECyT 1 IPN}
+        {Social service \& IT collaboration}
+        {Hardware, software, and server support and maintenance.}
+
+    \section{Organizations}
+
+    \job{11/2019 --- present}
+        {FIDE}
+        {Federated player}
+        {Official tournaments; \textbf{FIDE rating 1599.} UPIITA-IPN.}
+
+    \job{01/2013 --- present}
+        {IEEE}
+        {Student member}
+        {Training and technical groups; IEEE student branch UPIITA-IPN.}
+
+    \section[\faGears]{Projects}
+
+    \job{03/2026 --- 03/2026}
+        {Selection contest}
+        {Rappi operational diagnostic}
+        {Econometric panel, elasticity, and ops alerts. \href{https://github.com/sigmadg/rappi-case}{GitHub}}
+
+    \job{12/2025 --- 01/2026}
+        {Grupo Salinas}
+        {Kafka monitoring (Prometheus, Grafana, Rust)}
+        {Prometheus/Grafana; scrape; Rust. \href{https://github.com/sigmadg/Rust_Grafana}{GitHub}}
+
+    \job{11/2025 --- 12/2025}
+        {UNIR}
+        {Alpaca Portfolio Bot}
+        {Paper trading; portfolio, risk, and Telegram. \href{https://github.com/sigmadg/alpaca-portfolio-bot}{GitHub}}
+
+    \job{07/2025 --- 11/2025}
+        {Grupo Salinas}
+        {Kafka integration · .NET 8 microservices}
+        {.NET 8 producer/consumer; NuGet/Avro; E2E. \href{https://github.com/sigmadg/Kafka_librer-as_productores}{GitHub}}
+
+    \job{05/2025 --- 06/2025}
+        {Grupo Salinas}
+        {Contracts LLM (OpenAPI/AsyncAPI + RAG)}
+        {LLM + RAG; FastAPI, React/TS, Cypress. \href{https://github.com/sigmadg/Contratos_LLM}{GitHub}}
+
+    \job{2023 --- 2024}
+        {UNIR}
+        {Three-body problem (numerical methods)}
+        {Numerical comparison without closed-form solution.}
+
+    \job{2019 --- 2021}
+        {UPIITA-IPN}
+        {SDR transceiver}
+        {Prototype SDR transceiver with automatic noise reduction. \href{https://github.com/sigmadg/transceiver}{GitHub} · \href{https://www.youtube.com/watch?v=uf3WM0KGN4k}{YouTube}}
+
+    \job{03/2019 --- 08/2019}
+        {Workana}
+        {Audiovisual equalizer (Blender + PyQt5)}
+        {Blender (\texttt{bpy}) + PyQt5; FFT and reactive geometry. \href{https://github.com/sigmadg/ecualizador}{GitHub}}
+}
+
+\makebody
+% ----- Versión en español (mismo PDF) -----
+\clearpage
+\ClearShipoutPicture
+\AddToShipoutPictureBG*{\cvPageBg}
+\pagestyle{cvpage}%
+
+\name{Ana Gabriela Ordoñez Güemes}
+\cvheadline{IA Engineer · Python Developer · Machine Learning\par\vspace{0.12em}Modelos de lenguaje locales · AI Agents}
+\cvheaderfooter{México · CDMX}
+\cvsummary{Desarrollo en Python, automatización e integración por APIs; n8n, agentes de IA y ML aplicado. Experiencia en APIs, microservicios, Kafka, CI/CD y pruebas automatizadas. Maestría en Ingeniería Matemática y Computación (UNIR) e Ingeniería en Telemática (UPIITA-IPN).}
+\photo[round]{profile.jpg}{4.25cm}
+
+\makeheader
+\vspace{0.45em}
+% ===== Cuerpo: barra lateral + columna principal (un solo bloque, sin salto entre aptitudes/idiomas ni experiencia/formación) =====
+\highlightbar{
+
+    \sidebarsection{Contacto}
+    \email{gabyordgue@gmail.com}
+    \phone{+52 55 2873 9945}
+    \location{CDMX, México}
+    \homepage{gabyordonez.com}{https://gabyordonez.com/}
+    \homepage{GitHub}{https://github.com/sigmadg}
+    \linkedin{agabrielaordonezg}{https://www.linkedin.com/in/agabrielaordonezg}
+
+    \sidebarsection{Aptitudes}
+
+    \skillsection{Automatización e IA}
+    \skillpairname{Python}{n8n}
+    \skillpairname{AI Agents}{LangChain}
+    \skillpairname{Deep Learning}{PyTorch}
+    \skillpairname{GitHub Actions}{Playwright}
+    \skillpairname{Jupyter}{Local LLMs}
+    \skillpairname{MATLAB}{Simulink}
+    \simpleskill{\LaTeX}
+
+    \vspace{0.15em}
+    \skillsection{Cloud y backend}
+    \skillpairname{APIs}{Microservicios}
+    \skillpairname{AWS Lambda}{AWS S3}
+    \skillpairname{Kafka}{Vue.js}
+    \skillpairname{Spring Boot}{Quarkus}
+    \skillpairname{C\#}{.NET}
+    \skillpairname{Flutter}{PL/SQL}
+    \skillpairname{MongoDB}{MySQL}
+
+    \vspace{0.15em}
+    \skillsection{Calidad y DevOps}
+    \skillpairname{Selenium}{Cypress}
+    \skillpairname{Jenkins}{Docker / Bash}
+    \skillpairname{Terraform}{Kubernetes}
+    \simpleskill{Git}
+
+    \vspace{0.15em}
+    \skillsection{Habilidades blandas}
+    \simpleskill{Comunicación clara}
+    \simpleskill{Autogestión}
+    \simpleskill{Colaboración}
+    \simpleskill{Documentación}
+    \simpleskill{Proactividad}
+    \simpleskill{Gestión del tiempo}
+
+    \sidebarsection{Idiomas}
+    \simpleskill{Español (C2)}
+    \simpleskill{Inglés (B1)}
+
+    \sidebarsection{Certificaciones}
+    \simpleskill{Máster Big Data y BI (EEBE)}
+    \simpleskill{Máster IA Empresarial (EEBE)}
+    \simpleskill{Circuitos y Electrónica (MITx)}
+    \simpleskill{Computer Systems Technician}
+    \simpleskill{Digital Graphic Design Technician}
+
+    \sidebarsection{Enlaces}
+    \homepage{Cursos}{https://drive.google.com/drive/folders/16cvOwrCB_geqIQOabGLMpdz50U-KTZm2?usp=drive_link}
+    \homepage{Certificados}{https://drive.google.com/drive/folders/1TkdAf2R2titBM4nMeZdWtvO6gMa8j_QN?usp=drive_link}
+}
+
+\mainbar{
+
+    \section[\faGears]{Experiencia laboral}
+
+    \job{06/2022 --- 02/2026}
+        {Grupo Salinas}
+        {New Technologies Developer}
+        {\begin{itemize}
+            \item APIs, microservicios, IA/LLM, n8n, Kafka y adaptador Kafka en .NET.
+            \item OpenAPI/AsyncAPI automatizado; reconocimiento facial; Selenium, Jenkins y DevOps.
+        \end{itemize}}
+
+    \job{08/2021 --- 07/2022}
+        {GoNet}
+        {Middleware Front End Developer}
+        {\begin{itemize}
+            \item Front-end enterprise (Vue.js) para Palace Resorts.
+        \end{itemize}}
+
+    \job{02/2019 --- 01/2021}
+        {IBM}
+        {Oracle Application Developer: EBS}
+        {\begin{itemize}
+            \item Programa de aprendices: PL/SQL e incidentes para clientes financieros y de seguros.
+            \item Incidentes en producción, BPM (JavaScript) y pruebas unitarias en sector financiero.
+        \end{itemize}}
+
+    \section[\faMortarBoard]{Formación}
+
+    \job{02/2024 --- 02/2026}
+        {UNIR}
+        {Maestría en Ing. Matemática y Computación}
+        {ML, métodos numéricos y modelado.}
+
+    \job{08/2012 --- 12/2018}
+        {UPIITA-IPN}
+        {Ingeniería en Telemática}
+        {Telecomunicaciones, redes y programación.}
+
+    \job{06/2009 --- 06/2012}
+        {CECyT 1 IPN}
+        {Técnico en sistemas digitales}
+        {Electrónica y programación.}
+
+    \section{Voluntariado}
+
+    \job{08/2021 --- 11/2021}
+        {Polibots Academy}
+        {Community Manager}
+        {Gestión y difusión académica de la comunidad.}
+
+    \job{08/2019 --- 11/2019}
+        {Ajedrez UPIITA}
+        {Coordinadora}
+        {Clases, coordinación del taller y trámites administrativos.}
+
+    \job{09/2010 --- 07/2012}
+        {UDI CECyT 1 IPN}
+        {Servicio social y colaboración TI}
+        {Soporte y mantenimiento de hardware, software y servidores.}
+
+    \section{Organizaciones}
+
+    \job{11/2019 --- actual.}
+        {FIDE}
+        {Jugadora federada}
+        {Torneos oficiales; \textbf{rating FIDE 1599.} UPIITA-IPN.}
+
+    \job{01/2013 --- actual.}
+        {IEEE}
+        {Miembro estudiantil}
+        {Formación y grupos técnicos; rama estudiantil IEEE UPIITA-IPN.}
+
+    \section[\faGears]{Proyectos}
+
+    \job{03/2026 --- 03/2026}
+        {Concurso selección}
+        {Diagnóstico operacional Rappi}
+        {Panel econométrico, elasticidad y alertas \emph{ops}. \href{https://github.com/sigmadg/rappi-case}{GitHub}}
+
+    \job{12/2025 --- 01/2026}
+        {Grupo Salinas}
+        {Monitoreo Kafka (Prometheus, Grafana, Rust)}
+        {Prometheus/Grafana; \emph{scrape}; Rust. \href{https://github.com/sigmadg/Rust_Grafana}{GitHub}}
+
+    \job{11/2025 --- 12/2025}
+        {UNIR}
+        {Alpaca Portfolio Bot}
+        {Paper trading; cartera, riesgo y Telegram. \href{https://github.com/sigmadg/alpaca-portfolio-bot}{GitHub}}
+
+    \job{07/2025 --- 11/2025}
+        {Grupo Salinas}
+        {Integración Kafka · microservicios .NET 8}
+        {.NET 8 productor/consumidor; NuGet/Avro; E2E. \href{https://github.com/sigmadg/Kafka_librer-as_productores}{GitHub}}
+
+    \job{05/2025 --- 06/2025}
+        {Grupo Salinas}
+        {Contratos LLM (OpenAPI/AsyncAPI + RAG)}
+        {LLM + RAG; FastAPI, React/TS, Cypress. \href{https://github.com/sigmadg/Contratos_LLM}{GitHub}}
+
+    \job{2023 --- 2024}
+        {UNIR}
+        {Tres cuerpos (métodos numéricos)}
+        {Comparación numérica sin solución analítica cerrada.}
+
+    \job{2019 --- 2021}
+        {UPIITA-IPN}
+        {Transceptor SDR}
+        {Prototipo de transceptor SDR automático para reducir el ruido. \href{https://github.com/sigmadg/transceiver}{GitHub} · \href{https://www.youtube.com/watch?v=uf3WM0KGN4k}{YouTube}}
+
+    \job{03/2019 --- 08/2019}
+        {Workana}
+        {Ecualizador audiovisual (Blender + PyQt5)}
+        {Blender (\texttt{bpy}) + PyQt5; FFT y geometría reactiva. \href{https://github.com/sigmadg/ecualizador}{GitHub}}
+}
+
+\makebody
+
+\end{document}
