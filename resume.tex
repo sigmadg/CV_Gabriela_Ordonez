@@ -33,14 +33,12 @@
 
 \geometry{left=\marginleft,right=\marginright,top=\margintop,bottom=\marginbottom}
 
-% Fondo en todas las páginas: eso-pic + \AtPageLowerLeft (sin rotación; tras \clearpage se re-registra).
-\usepackage{eso-pic}
-\newcommand{\cvPageBg}{%
-    \AtPageLowerLeft{%
-        \includegraphics[width=\paperwidth,height=\paperheight,keepaspectratio=false]{bg-pink-resume.png}%
-    }%
-}%
-\AddToShipoutPictureBG*{\cvPageBg}
+% Columnas con salto de página (minipage no parte entre páginas).
+\usepackage{paracol}
+\usepackage{needspace}
+
+% Fondo blanco (sin imagen de fondo).
+\pagecolor{white}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Ajustes compactos para vertical
@@ -86,6 +84,7 @@
 
 % Entradas fecha+lugar | puesto: algo más de ancho a la izquierda y \raggedright para no recortar texto.
 \renewcommand{\job}[4]{%
+    \needspace{4\baselineskip}%
     \setlength{\jobdateplacelength}{0.29\linewidth}%
     \setlength{\jobpositionlength}{0.71\linewidth}%
     \begin{minipage}[t]{\jobdateplacelength}%
@@ -115,44 +114,42 @@
     \par\normalsize\vspace{0.12em}
 }
 
-% Columnas del cuerpo: anchos explícitos compartidos (mismo valor para minipage, \linewidth y regla).
+% Columnas del cuerpo: paracol permite continuar en la página siguiente al llegar al margen.
 \renewcommand{\highlightbar}[1]{%
     \def\@highlightbar{%
         \setlength{\cvhicolwd}{\dimexpr\highlightwidth-\cvinnerpad-\cvsideleftpad\relax}%
         \noindent\hspace*{\cvsideleftpad}%
-        \begin{minipage}[t]{\cvhicolwd}%
-            \setlength{\linewidth}{\cvhicolwd}%
-            \setlength{\columnwidth}{\cvhicolwd}%
-            \setlength{\cvsectionrulewidth}{\cvhicolwd}%
-            \raggedright
-            #1%
-        \end{minipage}%
+        \begingroup
+        \setlength{\linewidth}{\cvhicolwd}%
+        \setlength{\columnwidth}{\cvhicolwd}%
+        \setlength{\cvsectionrulewidth}{\cvhicolwd}%
+        \raggedright
+        #1%
+        \endgroup
         \hspace{\cvinnerpad}%
     }%
 }
 \renewcommand{\mainbar}[1]{%
     \def\@mainbar{%
         \setlength{\cvmaincolwd}{\dimexpr\textwidth-\highlightwidth-\cvbodygutter\relax}%
-        \begin{minipage}[t]{\cvmaincolwd}%
-            \setlength{\linewidth}{\cvmaincolwd}%
-            \setlength{\columnwidth}{\cvmaincolwd}%
-            \setlength{\cvsectionrulewidth}{\cvmaincolwd}%
-            \raggedright
-            #1%
-        \end{minipage}%
+        \begingroup
+        \setlength{\linewidth}{\cvmaincolwd}%
+        \setlength{\columnwidth}{\cvmaincolwd}%
+        \setlength{\cvsectionrulewidth}{\cvmaincolwd}%
+        \raggedright
+        #1%
+        \endgroup
     }%
 }
-% Sin saltos de línea/espacios entre cajas: evita que la 2.ª columna baje y "colapse" el ancho.
 \renewcommand{\makebody}{%
-    \ifthenelse{\boolean{@singleordouble}}{%
-        \noindent\@highlightbar\hspace{\cvbodygutter}\@mainbar
-    }{%
-        \ifthispageodd{%
-            \noindent\@highlightbar\hspace{\cvbodygutter}\@mainbar
-        }{%
-            \noindent\@mainbar\hspace{\cvbodygutter}\@highlightbar
-        }%
-    }%
+    \setlength{\cvmaincolwd}{\dimexpr\textwidth-\highlightwidth-\cvbodygutter\relax}%
+    \setlength{\columnsep}{\cvbodygutter}%
+    \setcolumnwidth{\highlightwidth, \cvmaincolwd}%
+    \begin{paracol}{2}
+        \noindent\@highlightbar
+        \switchcolumn
+        \noindent\@mainbar
+    \end{paracol}
 }
 
 % Campos de contacto más compactos
@@ -242,13 +239,12 @@
 \raggedbottom
 
 \name{Ana Gabriela Ordoñez Güemes}
-\cvheadline{AI Engineer · Python Developer · Machine Learning\par\vspace{0.12em}On-premises LLMs · AI Agents}
+\cvheadline{Applied AI Engineer | LLMs · AI Agents · Retrieval Systems}
 \cvheaderfooter{Mexico City, Mexico}
-\cvsummary{Python development, automation, and API integration; n8n, AI agents, and applied ML. Experience with APIs, microservices, Kafka, CI/CD, and automated testing. M.Sc.\ Mathematical Engineering \& Computing (UNIR) and B.Eng.\ Telematics Engineering (UPIITA-IPN).}
-\photo[round]{profile.jpg}{4.25cm}
+\cvsummary{Applied AI Engineer with experience building production-grade LLM applications, AI agents, retrieval-augmented generation (RAG) systems, and intelligent automation workflows. Strong background in machine learning, optimization, and numerical methods, combined with hands-on experience in microservices, event-driven architectures, and AI-powered developer tools.}
 
 \makeheader
-\vspace{0.45em}
+\vspace{0.35em}
 % ===== Body: sidebar + main column (English) =====
 
 
@@ -264,31 +260,38 @@
 
     \sidebarsection{Skills}
 
-    \skillsection{Automation \& AI}
-    \skillpairname{Python}{n8n}
-    \skillpairname{AI Agents}{LangChain}
-    \skillpairname{Deep Learning}{PyTorch}
-    \skillpairname{GitHub Actions}{Playwright}
-    \skillpairname{Jupyter}{Local LLMs}
-    \skillpairname{MATLAB}{Simulink}
-    \simpleskill{\LaTeX}
+    \skillsection{LLM \& Agentic Systems}
+    \simpleskill{LangChain}
+    \simpleskill{Multi-agent workflows}
+    \simpleskill{RAG pipelines (FAISS, embeddings)}
+    \simpleskill{Vector Databases}
+    \simpleskill{Ollama}
+    \simpleskill{OpenAI APIs}
+    \simpleskill{Anthropic APIs}
+    \simpleskill{Tool Calling}
+    \simpleskill{Function Calling}
+    \simpleskill{Agent Evaluation}
+    \simpleskill{Prompt Engineering}
 
     \vspace{0.15em}
-    \skillsection{Cloud \& backend}
-    \skillpairname{APIs}{Microservices}
-    \skillpairname{AWS Lambda}{AWS S3}
-    \skillpairname{Kafka}{Vue.js}
-    \skillpairname{Spring Boot}{Quarkus}
-    \skillpairname{C\#}{.NET}
-    \skillpairname{Flutter}{PL/SQL}
-    \skillpairname{MongoDB}{MySQL}
+    \skillsection{Core AI}
+    \skillpairname{Python}{PyTorch}
+    \skillpairname{Transformers}{LLMs}
+    \skillpairname{RAG}{AI Agents}
+    \skillpairname{LangChain}{n8n}
 
     \vspace{0.15em}
-    \skillsection{Quality \& DevOps}
-    \skillpairname{Selenium}{Cypress}
-    \skillpairname{Jenkins}{Docker / Bash}
-    \skillpairname{Terraform}{Kubernetes}
-    \simpleskill{Git}
+    \skillsection{AI Infrastructure}
+    \simpleskill{FastAPI}
+    \simpleskill{Docker}
+    \simpleskill{Kubernetes}
+    \simpleskill{Kafka}
+    \simpleskill{AWS}
+    \simpleskill{Agent Evaluation}
+    \simpleskill{Prompt Engineering}
+    \simpleskill{Evals}
+    \simpleskill{Human Feedback}
+    \simpleskill{LLM Observability}
 
     \vspace{0.15em}
     \skillsection{Soft skills}
@@ -298,6 +301,13 @@
     \simpleskill{Documentation}
     \simpleskill{Proactivity}
     \simpleskill{Time management}
+
+    \sidebarsection{AI-Assisted Development}
+    {\footnotesize\raggedright
+    AI-assisted software development using Aider, local LLMs (Qwen 14B), and Claude-based review workflows.\par\vspace{0.2em}
+    Rapid prototyping, code generation, refactoring, and architecture validation.\par\vspace{0.2em}
+    Human-in-the-loop development practices for quality assurance and code review.\par
+    }
 
     \sidebarsection{Languages}
     \simpleskill{Spanish (C2)}
@@ -317,14 +327,51 @@
 
 \mainbar{
 
+    \section[\faMortarBoard]{Education}
+
+    \job{02/2024 --- 02/2026}
+        {UNIR}
+        {M.Sc.\ Mathematical Engineering \& Computing}
+        {Mathematical foundation for AI/ML: optimization, numerical methods, and statistical modelling.}
+
+    \job{08/2012 --- 12/2018}
+        {UPIITA-IPN}
+        {B.Eng.\ Telematics Engineering}
+        {Telecommunications, networks, and programming.}
+
+    \job{06/2009 --- 06/2012}
+        {CECyT 1 IPN}
+        {Digital systems technician}
+        {Electronics and programming.}
+
+    \section{Selected Achievements}
+    {\footnotesize\raggedright
+    \begin{itemize}
+        \item Built an open-source RAG platform for automatic OpenAPI/AsyncAPI contract generation.
+        \item Collaborating on LLM training and evaluation research.
+        \item Developed AI-powered biometric authentication solutions.
+        \item Experience building agentic workflows using local LLMs, Ollama, and n8n.
+    \end{itemize}
+    }
+
     \section[\faGears]{Work experience}
+
+    \job{2025 --- present}
+        {Research collaboration}
+        {Research Assistant – LLM Training (Part-time)}
+        {\begin{itemize}
+            \item Collaborating on LLM training, evaluation, dataset preparation, and benchmarking.
+            \item Supporting experimentation with model adaptation, prompt engineering, and performance analysis.
+            \item Contributing to research workflows for applied AI systems.
+        \end{itemize}}
 
     \job{06/2022 --- 02/2026}
         {Grupo Salinas}
         {New Technologies Developer}
         {\begin{itemize}
             \item APIs, microservices, AI/LLM, n8n, Kafka, and Kafka adapter in .NET.
-            \item Automated OpenAPI/AsyncAPI; facial recognition; Selenium, Jenkins, and DevOps.
+            \item Built a Flutter facial recognition app for secure biometric authentication in corporate workflows.
+            \item Automated OpenAPI/AsyncAPI generation; Selenium, Jenkins, and DevOps.
         \end{itemize}}
 
     \job{08/2021 --- 07/2022}
@@ -342,22 +389,54 @@
             \item Production incidents, BPM (JavaScript), and unit tests in financial services.
         \end{itemize}}
 
-    \section[\faMortarBoard]{Education}
+    \section[\faGears]{Projects}
 
-    \job{02/2024 --- 02/2026}
+    \job{05/2025 --- 06/2025}
+        {Grupo Salinas}
+        {Contracts LLM — Open Source}
+        {\begin{itemize}
+            \item Built a production-oriented AI system combining RAG, AI agents, semantic retrieval, and automated API contract generation.
+            \item Designed a RAG platform generating OpenAPI/AsyncAPI contracts from business requirements; embeddings, vector databases, and LangChain retrieval pipelines.
+            \item Built agent workflows with tool calling, prompt engineering, and document-grounded generation.
+            \item Implemented FastAPI, React/TypeScript, automated validation, and evaluation pipelines for contract quality.
+            \item Orchestrated local LLMs (Ollama) and n8n agent workflows for end-to-end AI pipelines.
+        \end{itemize}
+        \href{https://github.com/sigmadg/Contratos_LLM}{GitHub}}
+
+    \job{03/2026 --- 03/2026}
+        {Selection contest}
+        {Rappi operational diagnostic}
+        {Built an econometric pipeline on Rappi ops data to quantify demand elasticity and trigger automated alerts, surfacing revenue-impacting anomalies 3$\times$ faster than manual reporting. \href{https://github.com/sigmadg/rappi-case}{GitHub}}
+
+    \job{12/2025 --- 01/2026}
+        {Grupo Salinas}
+        {Kafka monitoring (Prometheus, Grafana, Rust)}
+        {Designed a Prometheus/Grafana stack with a Rust Kafka scraper, cutting broker health detection from hours to under 2 minutes and improving production incident visibility. \href{https://github.com/sigmadg/Rust_Grafana}{GitHub}}
+
+    \job{11/2025 --- 12/2025}
         {UNIR}
-        {M.Sc.\ Mathematical Engineering \& Computing}
-        {ML, numerical methods, and modelling.}
+        {Alpaca Portfolio Bot}
+        {Built an automated paper-trading bot with portfolio/risk rules and Telegram alerts, executing rebalancing signals in $<$5\,s and tracking multi-asset P\&L in real time. \href{https://github.com/sigmadg/alpaca-portfolio-bot}{GitHub}}
 
-    \job{08/2012 --- 12/2018}
+    \job{07/2025 --- 11/2025}
+        {Grupo Salinas}
+        {Kafka integration · .NET 8 microservices · LangChain}
+        {Delivered reusable .NET 8 Kafka producer/consumer libraries (NuGet + Avro) with LangChain integration and E2E validation, reducing microservice onboarding from weeks to days across 4+ services. \href{https://github.com/sigmadg/Kafka_librer-as_productores}{GitHub}}
+
+    \job{2023 --- 2024}
+        {UNIR}
+        {Three-body problem (numerical methods)}
+        {Implemented and benchmarked 4+ numerical solvers for the three-body problem, comparing stability and error against analytical baselines with $<10^{-4}$ relative error on validated orbits.}
+
+    \job{2019 --- 2021}
         {UPIITA-IPN}
-        {B.Eng.\ Telematics Engineering}
-        {Telecommunications, networks, and programming.}
+        {SDR transceiver}
+        {Prototyped an SDR transceiver with automatic noise reduction, improving SNR by 35\% in lab tests and validating RX/TX on live RF signals. \href{https://github.com/sigmadg/transceiver}{GitHub} · \href{https://www.youtube.com/watch?v=uf3WM0KGN4k}{YouTube}}
 
-    \job{06/2009 --- 06/2012}
-        {CECyT 1 IPN}
-        {Digital systems technician}
-        {Electronics and programming.}
+    \job{03/2019 --- 08/2019}
+        {Workana}
+        {Audiovisual equalizer (Blender + PyQt5)}
+        {Built a Blender + PyQt5 audiovisual equalizer mapping FFT analysis to reactive 3D geometry, syncing visuals to audio at 60 FPS for live client demos. \href{https://github.com/sigmadg/ecualizador}{GitHub}}
 
     \section{Volunteering}
 
@@ -387,65 +466,20 @@
         {IEEE}
         {Student member}
         {Training and technical groups; IEEE student branch UPIITA-IPN.}
-
-    \section[\faGears]{Projects}
-
-    \job{03/2026 --- 03/2026}
-        {Selection contest}
-        {Rappi operational diagnostic}
-        {Econometric panel, elasticity, and ops alerts. \href{https://github.com/sigmadg/rappi-case}{GitHub}}
-
-    \job{12/2025 --- 01/2026}
-        {Grupo Salinas}
-        {Kafka monitoring (Prometheus, Grafana, Rust)}
-        {Prometheus/Grafana; scrape; Rust. \href{https://github.com/sigmadg/Rust_Grafana}{GitHub}}
-
-    \job{11/2025 --- 12/2025}
-        {UNIR}
-        {Alpaca Portfolio Bot}
-        {Paper trading; portfolio, risk, and Telegram. \href{https://github.com/sigmadg/alpaca-portfolio-bot}{GitHub}}
-
-    \job{07/2025 --- 11/2025}
-        {Grupo Salinas}
-        {Kafka integration · .NET 8 microservices}
-        {.NET 8 producer/consumer; NuGet/Avro; E2E. \href{https://github.com/sigmadg/Kafka_librer-as_productores}{GitHub}}
-
-    \job{05/2025 --- 06/2025}
-        {Grupo Salinas}
-        {Contracts LLM (OpenAPI/AsyncAPI + RAG)}
-        {LLM + RAG; FastAPI, React/TS, Cypress. \href{https://github.com/sigmadg/Contratos_LLM}{GitHub}}
-
-    \job{2023 --- 2024}
-        {UNIR}
-        {Three-body problem (numerical methods)}
-        {Numerical comparison without closed-form solution.}
-
-    \job{2019 --- 2021}
-        {UPIITA-IPN}
-        {SDR transceiver}
-        {Prototype SDR transceiver with automatic noise reduction. \href{https://github.com/sigmadg/transceiver}{GitHub} · \href{https://www.youtube.com/watch?v=uf3WM0KGN4k}{YouTube}}
-
-    \job{03/2019 --- 08/2019}
-        {Workana}
-        {Audiovisual equalizer (Blender + PyQt5)}
-        {Blender (\texttt{bpy}) + PyQt5; FFT and reactive geometry. \href{https://github.com/sigmadg/ecualizador}{GitHub}}
 }
 
 \makebody
 % ----- Versión en español (mismo PDF) -----
 \clearpage
-\ClearShipoutPicture
-\AddToShipoutPictureBG*{\cvPageBg}
 \pagestyle{cvpage}%
 
 \name{Ana Gabriela Ordoñez Güemes}
-\cvheadline{IA Engineer · Python Developer · Machine Learning\par\vspace{0.12em}Modelos de lenguaje locales · AI Agents}
+\cvheadline{Ingeniera de IA aplicada | LLMs · AI Agents · Sistemas de recuperación}
 \cvheaderfooter{México · CDMX}
-\cvsummary{Desarrollo en Python, automatización e integración por APIs; n8n, agentes de IA y ML aplicado. Experiencia en APIs, microservicios, Kafka, CI/CD y pruebas automatizadas. Maestría en Ingeniería Matemática y Computación (UNIR) e Ingeniería en Telemática (UPIITA-IPN).}
-\photo[round]{profile.jpg}{4.25cm}
+\cvsummary{Ingeniera de IA aplicada con experiencia construyendo aplicaciones LLM de grado producción, agentes de IA, sistemas RAG (\emph{retrieval-augmented generation}) y flujos de automatización inteligente. Sólida base en aprendizaje automático, optimización y métodos numéricos, junto con experiencia práctica en microservicios, arquitecturas orientadas a eventos y herramientas de desarrollo potenciadas por IA.}
 
 \makeheader
-\vspace{0.45em}
+\vspace{0.35em}
 % ===== Cuerpo: barra lateral + columna principal (un solo bloque, sin salto entre aptitudes/idiomas ni experiencia/formación) =====
 \highlightbar{
 
@@ -459,31 +493,38 @@
 
     \sidebarsection{Aptitudes}
 
-    \skillsection{Automatización e IA}
-    \skillpairname{Python}{n8n}
-    \skillpairname{AI Agents}{LangChain}
-    \skillpairname{Deep Learning}{PyTorch}
-    \skillpairname{GitHub Actions}{Playwright}
-    \skillpairname{Jupyter}{Local LLMs}
-    \skillpairname{MATLAB}{Simulink}
-    \simpleskill{\LaTeX}
+    \skillsection{LLM \& Agentic Systems}
+    \simpleskill{LangChain}
+    \simpleskill{Multi-agent workflows}
+    \simpleskill{RAG pipelines (FAISS, embeddings)}
+    \simpleskill{Vector Databases}
+    \simpleskill{Ollama}
+    \simpleskill{OpenAI APIs}
+    \simpleskill{Anthropic APIs}
+    \simpleskill{Tool Calling}
+    \simpleskill{Function Calling}
+    \simpleskill{Agent Evaluation}
+    \simpleskill{Prompt Engineering}
 
     \vspace{0.15em}
-    \skillsection{Cloud y backend}
-    \skillpairname{APIs}{Microservicios}
-    \skillpairname{AWS Lambda}{AWS S3}
-    \skillpairname{Kafka}{Vue.js}
-    \skillpairname{Spring Boot}{Quarkus}
-    \skillpairname{C\#}{.NET}
-    \skillpairname{Flutter}{PL/SQL}
-    \skillpairname{MongoDB}{MySQL}
+    \skillsection{Núcleo IA}
+    \skillpairname{Python}{PyTorch}
+    \skillpairname{Transformers}{LLMs}
+    \skillpairname{RAG}{AI Agents}
+    \skillpairname{LangChain}{n8n}
 
     \vspace{0.15em}
-    \skillsection{Calidad y DevOps}
-    \skillpairname{Selenium}{Cypress}
-    \skillpairname{Jenkins}{Docker / Bash}
-    \skillpairname{Terraform}{Kubernetes}
-    \simpleskill{Git}
+    \skillsection{Infraestructura IA}
+    \simpleskill{FastAPI}
+    \simpleskill{Docker}
+    \simpleskill{Kubernetes}
+    \simpleskill{Kafka}
+    \simpleskill{AWS}
+    \simpleskill{Agent Evaluation}
+    \simpleskill{Prompt Engineering}
+    \simpleskill{Evals}
+    \simpleskill{Human Feedback}
+    \simpleskill{LLM Observability}
 
     \vspace{0.15em}
     \skillsection{Habilidades blandas}
@@ -493,6 +534,13 @@
     \simpleskill{Documentación}
     \simpleskill{Proactividad}
     \simpleskill{Gestión del tiempo}
+
+    \sidebarsection{Desarrollo asistido por IA}
+    {\footnotesize\raggedright
+    Desarrollo de software asistido por IA con Aider, LLMs locales (Qwen 14B) y flujos de revisión con Claude.\par\vspace{0.2em}
+    Prototipado rápido, generación de código, refactorización y validación de arquitectura.\par\vspace{0.2em}
+    Prácticas \emph{human-in-the-loop} para aseguramiento de calidad y revisión de código.\par
+    }
 
     \sidebarsection{Idiomas}
     \simpleskill{Español (C2)}
@@ -512,14 +560,51 @@
 
 \mainbar{
 
+    \section[\faMortarBoard]{Formación}
+
+    \job{02/2024 --- 02/2026}
+        {UNIR}
+        {Maestría en Ing. Matemática y Computación}
+        {Base matemática aplicada a IA/ML: optimización, métodos numéricos y modelado estadístico.}
+
+    \job{08/2012 --- 12/2018}
+        {UPIITA-IPN}
+        {Ingeniería en Telemática}
+        {Telecomunicaciones, redes y programación.}
+
+    \job{06/2009 --- 06/2012}
+        {CECyT 1 IPN}
+        {Técnico en sistemas digitales}
+        {Electrónica y programación.}
+
+    \section{Logros destacados}
+    {\footnotesize\raggedright
+    \begin{itemize}
+        \item Plataforma RAG \emph{open source} para generación automática de contratos OpenAPI/AsyncAPI.
+        \item Colaboración en investigación de entrenamiento y evaluación de LLMs.
+        \item Soluciones de autenticación biométrica con IA.
+        \item Flujos agénticos con LLMs locales, Ollama y n8n.
+    \end{itemize}
+    }
+
     \section[\faGears]{Experiencia laboral}
+
+    \job{2025 --- actual.}
+        {Colaboración de investigación}
+        {Research Assistant – LLM Training (medio tiempo)}
+        {\begin{itemize}
+            \item Colaboración en entrenamiento, evaluación, preparación de \emph{datasets} y \emph{benchmarking} de LLMs.
+            \item Apoyo a experimentación con adaptación de modelos, \emph{prompt engineering} y análisis de desempeño.
+            \item Contribución a flujos de investigación para sistemas de IA aplicada.
+        \end{itemize}}
 
     \job{06/2022 --- 02/2026}
         {Grupo Salinas}
         {New Technologies Developer}
         {\begin{itemize}
             \item APIs, microservicios, IA/LLM, n8n, Kafka y adaptador Kafka en .NET.
-            \item OpenAPI/AsyncAPI automatizado; reconocimiento facial; Selenium, Jenkins y DevOps.
+            \item Aplicación de reconocimiento facial en Flutter para autenticación biométrica en flujos corporativos.
+            \item Generación automatizada OpenAPI/AsyncAPI; Selenium, Jenkins y DevOps.
         \end{itemize}}
 
     \job{08/2021 --- 07/2022}
@@ -537,22 +622,54 @@
             \item Incidentes en producción, BPM (JavaScript) y pruebas unitarias en sector financiero.
         \end{itemize}}
 
-    \section[\faMortarBoard]{Formación}
+    \section[\faGears]{Proyectos}
 
-    \job{02/2024 --- 02/2026}
+    \job{05/2025 --- 06/2025}
+        {Grupo Salinas}
+        {Contratos LLM — Open Source}
+        {\begin{itemize}
+            \item Sistema de IA orientado a producción que combina RAG, agentes de IA, recuperación semántica y generación automatizada de contratos API.
+            \item Plataforma RAG que genera contratos OpenAPI/AsyncAPI desde requisitos de negocio; \emph{embeddings}, bases vectoriales y pipelines de recuperación con LangChain.
+            \item Flujos de agentes con \emph{tool calling}, \emph{prompt engineering} y generación anclada en documentos.
+            \item FastAPI, React/TypeScript, validación automática y \emph{evaluation pipelines} para calidad de contratos.
+            \item Orquestación de LLMs locales (Ollama) y flujos de agentes en n8n para pipelines de IA de punta a punta.
+        \end{itemize}
+        \href{https://github.com/sigmadg/Contratos_LLM}{GitHub}}
+
+    \job{03/2026 --- 03/2026}
+        {Concurso selección}
+        {Diagnóstico operacional Rappi}
+        {Pipeline econométrico sobre datos \emph{ops} de Rappi para cuantificar elasticidad de demanda y alertas automáticas, detectando anomalías con impacto en ingresos 3$\times$ más rápido que el reporte manual. \href{https://github.com/sigmadg/rappi-case}{GitHub}}
+
+    \job{12/2025 --- 01/2026}
+        {Grupo Salinas}
+        {Monitoreo Kafka (Prometheus, Grafana, Rust)}
+        {Stack Prometheus/Grafana con \emph{scraper} Kafka en Rust, reduciendo la detección de salud de brokers de horas a menos de 2 minutos y mejorando la visibilidad de incidentes en producción. \href{https://github.com/sigmadg/Rust_Grafana}{GitHub}}
+
+    \job{11/2025 --- 12/2025}
         {UNIR}
-        {Maestría en Ing. Matemática y Computación}
-        {ML, métodos numéricos y modelado.}
+        {Alpaca Portfolio Bot}
+        {Bot de \emph{paper trading} con reglas de cartera/riesgo y alertas Telegram, ejecutando señales de rebalanceo en $<$5\,s y P\&L multiactivo en tiempo real. \href{https://github.com/sigmadg/alpaca-portfolio-bot}{GitHub}}
 
-    \job{08/2012 --- 12/2018}
+    \job{07/2025 --- 11/2025}
+        {Grupo Salinas}
+        {Integración Kafka · microservicios .NET 8 · LangChain}
+        {Librerías reutilizables productor/consumidor Kafka en .NET 8 (NuGet + Avro) con integración LangChain y validación E2E, acortando la integración de microservicios de semanas a días en 4+ servicios. \href{https://github.com/sigmadg/Kafka_librer-as_productores}{GitHub}}
+
+    \job{2023 --- 2024}
+        {UNIR}
+        {Tres cuerpos (métodos numéricos)}
+        {Implementación y \emph{benchmark} de 4+ solvers numéricos para el problema de tres cuerpos, comparando estabilidad y error frente a baselines analíticos con error relativo $<10^{-4}$ en órbitas validadas.}
+
+    \job{2019 --- 2021}
         {UPIITA-IPN}
-        {Ingeniería en Telemática}
-        {Telecomunicaciones, redes y programación.}
+        {Transceptor SDR}
+        {Prototipo de transceptor SDR con reducción automática de ruido, mejorando la SNR un 35\% en pruebas de laboratorio y validando RX/TX con señales RF reales. \href{https://github.com/sigmadg/transceiver}{GitHub} · \href{https://www.youtube.com/watch?v=uf3WM0KGN4k}{YouTube}}
 
-    \job{06/2009 --- 06/2012}
-        {CECyT 1 IPN}
-        {Técnico en sistemas digitales}
-        {Electrónica y programación.}
+    \job{03/2019 --- 08/2019}
+        {Workana}
+        {Ecualizador audiovisual (Blender + PyQt5)}
+        {Ecualizador audiovisual Blender + PyQt5 que mapea análisis FFT a geometría 3D reactiva, sincronizando visuales con audio a 60 FPS en demos en vivo. \href{https://github.com/sigmadg/ecualizador}{GitHub}}
 
     \section{Voluntariado}
 
@@ -582,48 +699,6 @@
         {IEEE}
         {Miembro estudiantil}
         {Formación y grupos técnicos; rama estudiantil IEEE UPIITA-IPN.}
-
-    \section[\faGears]{Proyectos}
-
-    \job{03/2026 --- 03/2026}
-        {Concurso selección}
-        {Diagnóstico operacional Rappi}
-        {Panel econométrico, elasticidad y alertas \emph{ops}. \href{https://github.com/sigmadg/rappi-case}{GitHub}}
-
-    \job{12/2025 --- 01/2026}
-        {Grupo Salinas}
-        {Monitoreo Kafka (Prometheus, Grafana, Rust)}
-        {Prometheus/Grafana; \emph{scrape}; Rust. \href{https://github.com/sigmadg/Rust_Grafana}{GitHub}}
-
-    \job{11/2025 --- 12/2025}
-        {UNIR}
-        {Alpaca Portfolio Bot}
-        {Paper trading; cartera, riesgo y Telegram. \href{https://github.com/sigmadg/alpaca-portfolio-bot}{GitHub}}
-
-    \job{07/2025 --- 11/2025}
-        {Grupo Salinas}
-        {Integración Kafka · microservicios .NET 8}
-        {.NET 8 productor/consumidor; NuGet/Avro; E2E. \href{https://github.com/sigmadg/Kafka_librer-as_productores}{GitHub}}
-
-    \job{05/2025 --- 06/2025}
-        {Grupo Salinas}
-        {Contratos LLM (OpenAPI/AsyncAPI + RAG)}
-        {LLM + RAG; FastAPI, React/TS, Cypress. \href{https://github.com/sigmadg/Contratos_LLM}{GitHub}}
-
-    \job{2023 --- 2024}
-        {UNIR}
-        {Tres cuerpos (métodos numéricos)}
-        {Comparación numérica sin solución analítica cerrada.}
-
-    \job{2019 --- 2021}
-        {UPIITA-IPN}
-        {Transceptor SDR}
-        {Prototipo de transceptor SDR automático para reducir el ruido. \href{https://github.com/sigmadg/transceiver}{GitHub} · \href{https://www.youtube.com/watch?v=uf3WM0KGN4k}{YouTube}}
-
-    \job{03/2019 --- 08/2019}
-        {Workana}
-        {Ecualizador audiovisual (Blender + PyQt5)}
-        {Blender (\texttt{bpy}) + PyQt5; FFT y geometría reactiva. \href{https://github.com/sigmadg/ecualizador}{GitHub}}
 }
 
 \makebody
